@@ -1,4 +1,15 @@
-trigger: none
+trigger:
+  branches:
+    exclude:
+      - "*"
+
+schedules:
+  - cron: "*/5 * * * *"
+    displayName: "Every 5 mins"
+    branches:
+      include:
+        - main
+
 
 pool: 
   #vmImage: 'ubuntu-latest'
