@@ -6,7 +6,7 @@ variable "compute_subnet_id"           {
 
 variable "compute_image_id" { 
   type = string 
-  default = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaajlfyitbkkb7xd763rzkduqc3v4biryi6ebdvg7x5fo6arm7tv6hq"
+  default = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaa73bqv3ul5s4oicfyd65abbezcpuzpdw4t4fdfcjup2zzw2kvjnha"
 }
 
 variable "compute_name" { 
