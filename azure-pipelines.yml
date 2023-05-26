@@ -66,7 +66,7 @@ stages:
                     displayName: Download Authorized Public Key
                     name: pubkey
                     inputs:
-                      secureFile: authorized.key.pub
+                      secureFile: ssh-key-2023-05-15.key.pub
                   - task: TerraformCLI@0
                     inputs:
                       command: 'init'
