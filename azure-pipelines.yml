@@ -51,8 +51,8 @@ stages:
           displayName: TerraformApplyJob
           environment: "DEV"
           pool: 
-            vmImage: 'ubuntu-latest'
-            # name: SelfHostedPool
+            #vmImage: 'ubuntu-latest'
+            name: SelfHostedPool
           strategy: 
             runOnce:
               deploy:
