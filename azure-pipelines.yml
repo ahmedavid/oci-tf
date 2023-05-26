@@ -1,19 +1,91 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+trigger: none
 
-trigger:
-- none
+pool: 
+  #vmImage: 'ubuntu-latest'
+  name: SelfHostedPool
 
-pool:
-  vmImage: ubuntu-latest
+variables: 
+  - group: "Terraform Variables"
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+stages:
+    - stage: TerraformValidate
+      jobs:
+          - job: TerraformValidateJob
+            continueOnError: false
+            steps: 
+            - task: PublishPipelineArtifact@1
+              inputs:
+                targetPath: '$(System.DefaultWorkingDirectory)'
+                artifact: 'terraform-manifests-out'
+                publishLocation: 'pipeline'
+            - task: TerraformInstaller@0
+              displayName: Install Terraform
+              inputs:
+                terraformVersion: 'latest'
+            - task: TerraformCLI@0
+              inputs:
+                command: 'init'
+                workingDirectory: '$(System.DefaultWorkingDirectory)'
+                backendType: 'selfConfigured'
+                allowTelemetryCollection: false
+                commandOptions: "-backend-config=access_key=$(access_key) -backend-config=secret_key=$(secret_key)"
+              displayName: Terraform Init
+            - task: TerraformCLI@0
+              displayName: Terraform Validate
+              inputs:
+                command: 'validate'
+                allowTelemetryCollection: false 
+                workingDirectory: '$(System.DefaultWorkingDirectory)'
+            - task: Bash@3
+              inputs:
+                targetType: 'inline'
+                script: |
+                  echo "Print variables"
+                  echo "ocid: $(tenancy_ocid)"
+                  echo "fingerprint: $(fingerprint)"
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+
+    - stage: TerraformApply
+      jobs:
+        - deployment: TerraformApplyJob
+          displayName: TerraformApplyJob
+          environment: "DEV"
+          pool: 
+            #vmImage: 'ubuntu-latest'
+            name: SelfHostedPool
+          strategy: 
+            runOnce:
+              deploy:
+                steps:
+                  - task: DownloadSecureFile@1
+                    displayName: Download SSH Key
+                    name: sshkey
+                    inputs:
+                      secureFile: key.pem
+                  - task: DownloadSecureFile@1
+                    displayName: Download Authorized Public Key
+                    name: pubkey
+                    inputs:
+                      secureFile: ssh-key-2023-05-15.key.pub
+                  - task: TerraformCLI@0
+                    inputs:
+                      command: 'init'
+                      workingDirectory: '$(Pipeline.Workspace)/terraform-manifests-out'
+                      backendType: 'selfConfigured'
+                      allowTelemetryCollection: false
+                      commandOptions: "-backend-config=access_key=$(access_key) -backend-config=secret_key=$(secret_key)"
+                    displayName: Terraform Init
+                  - task: TerraformCLI@0
+                    displayName: TerraformPlan
+                    inputs:
+                      command: 'plan'
+                      workingDirectory: '$(Pipeline.Workspace)/terraform-manifests-out'
+                      commandOptions: -var tenancy_ocid=$(tenancy_ocid) -var user_ocid=$(user_ocid) -var fingerprint=$(fingerprint) -var private_key_path=$(sshkey.secureFilePath) -var compute_ssh_authorized_keys=$(pubkey.secureFilePath) -var compute_subnet_id=ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaqhtmfipn5fpfiw54stay5n3oaydzgorhooslocuvmf2xjnm7cfja -out $(Pipeline.Workspace)/terraform-manifests-out/plan-$(Build.BuildId).out
+                      allowTelemetryCollection: false
+                  - task: TerraformCLI@0
+                    displayName: Terraform Apply
+                    inputs:
+                      command: 'apply'
+                      workingDirectory: '$(Pipeline.Workspace)/terraform-manifests-out'
+                      commandOptions: '$(Pipeline.Workspace)/terraform-manifests-out/plan-$(Build.BuildId).out'
+                      allowTelemetryCollection: false
