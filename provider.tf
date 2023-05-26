@@ -11,8 +11,6 @@ terraform {
     key                         = "oci-david.tfstate"
     region                      = "fr-par"
     endpoint                    = "https://s3.fr-par.scw.cloud"
-    access_key                  = "SCWC6K43RJFD18TXH4MG"
-    secret_key                  = "cee8b6ab-d75b-493f-8454-a93c657df2c2"
     skip_credentials_validation = true
     skip_region_validation      = true
   }
