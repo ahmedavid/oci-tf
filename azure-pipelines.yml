@@ -4,8 +4,8 @@ trigger:
       - "*"
 
 schedules:
-  - cron: "*/10 * * * *"
-    displayName: "Every 5 mins"
+  - cron: "*/20 * * * *"
+    displayName: "Every 20 mins"
     branches:
       include:
         - main
