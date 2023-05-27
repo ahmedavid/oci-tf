@@ -11,7 +11,7 @@ variable "compute_image_id" {
 
 variable "compute_name" { 
   type = string 
-  default = "tf_vm1"
+  default = "arm-srv"
 }
 
 variable "compute_shape" {
