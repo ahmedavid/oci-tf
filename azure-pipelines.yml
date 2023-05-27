@@ -39,7 +39,7 @@ stages:
                 workingDirectory: '$(System.DefaultWorkingDirectory)'
                 backendType: 'selfConfigured'
                 allowTelemetryCollection: false
-                commandOptions: "-reconfigure -backend-config=access_key=$(access_key) -backend-config=secret_key=$(secret_key)"
+                commandOptions: "-backend-config=access_key=$(access_key) -backend-config=secret_key=$(secret_key)"
               displayName: Terraform Init
             - task: TerraformCLI@0
               displayName: Terraform Validate
@@ -84,7 +84,7 @@ stages:
                       workingDirectory: '$(Pipeline.Workspace)/terraform-manifests-out'
                       backendType: 'selfConfigured'
                       allowTelemetryCollection: false
-                      commandOptions: "-reconfigure -backend-config=access_key=$(access_key) -backend-config=secret_key=$(secret_key)"
+                      commandOptions: "-backend-config=access_key=$(access_key) -backend-config=secret_key=$(secret_key)"
                     displayName: Terraform Init
                   - task: TerraformCLI@0
                     displayName: TerraformPlan
