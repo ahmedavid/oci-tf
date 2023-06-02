@@ -45,7 +45,7 @@ output "availability_domain" {
 
 resource "oci_core_instance" "tf_compute" {
   # Required
-  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[random_integer.random_index.result].name
+  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
   compartment_id      = var.tenancy_ocid
   shape               = var.compute_shape
 
